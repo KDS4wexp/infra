@@ -7,6 +7,7 @@ on:
       - closed
     branches: 
       - main
+      - dev
 
 env:
   TF_VAR_token: ${{ secrets.TOKEN }}
@@ -19,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        layer: [platform-01]
         environment: [simple_dev]
     steps:
       - uses: actions/checkout@v4
@@ -30,10 +30,10 @@ jobs:
         continue-on-error: true
 
       - name: Trraform Init
-        working-directory: ./terraform/${{ matrix.environment }}/${{ matrix.layer }}
+        working-directory: ./terraform/${{ github.ref_name }}
         run: |
           terraform init -input=false \
-            -backend-config="key=terraform/${{ matrix.environment }}/${{ matrix.layer}}/terraform.tfstate" \
+            -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
             -backend-config="bucket=${{ secrets.BUCKET }}" \
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
@@ -42,23 +42,23 @@ jobs:
         run: terraform validate -no-color
 
       - name: Terraform Plan
-        working-directory: ./terraform/${{ matrix.environment }}/${{ matrix.layer }}
+        working-directory: ./terraform/${{ github.ref_name }}
         run: |
-          terraform plan -input=false -compact-warnings -out=plan_${{ matrix.environment }}_${{ matrix.layer }}.file
+          terraform plan -input=false -compact-warnings -out=plan_${{ github.ref_name }}.file
       
       - name: Save Plan
         uses: actions/upload-artifact@v4
         with:
-          name: plan_${{ matrix.environment }}_${{ matrix.layer }}.file
-          path: terraform/${{ matrix.environment }}/${{ matrix.layer }}/plan_${{ matrix.environment }}_${{ matrix.layer }}.file
+          name: plan_${{ github.ref_name }}.file
+          path: terraform/${{ github.ref_name }}/plan_${{ github.ref_name }}.file
           retention-days: 7
 
       - name: Terraform Apply
         if: github.event.pull_request.merged == true
-        working-directory: ./terraform/${{ matrix.environment }}/${{ matrix.layer }}
+        working-directory: ./terraform/${{ github.ref_name }}
         run: |
-          terraform apply plan_${{ matrix.environment }}_${{ matrix.layer }}.file \
-            -var="key=terraform/${{ matrix.environment }}/foundation-00/terraform.tfstate" \
+          terraform apply plan_${{ github.ref_name }}.file \
+            -var="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
             -var="bucket=${{ secrets.BUCKET }}" \
             -var="access_key=${{ secrets.ACCESS_KEY }}" \
             -var="secret_key=${{ secrets.SECRET_KEY }}
