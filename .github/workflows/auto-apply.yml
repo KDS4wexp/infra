@@ -19,6 +19,9 @@ env:
 jobs:
   auto:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    env:
+      TF_VAR_folder: ${{ secrets.FOLDER }}
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -55,9 +58,4 @@ jobs:
         if: github.event.pull_request.merged == true
         working-directory: ./terraform/${{ github.ref_name }}
         run: |
-          terraform apply -input=false  \
-            -var="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
-            -var="bucket=${{ secrets.BUCKET }}" \
-            -var="access_key=${{ secrets.ACCESS_KEY }}" \
-            -var="secret_key=${{ secrets.SECRET_KEY }}" \
-            plan.file
+          terraform apply -input=false plan.file
