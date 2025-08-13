@@ -58,8 +58,4 @@ jobs:
         if: github.event.pull_request.merged == true
         working-directory: ./terraform/${{ github.ref_name }}
         run: |
-          terraform apply plan_${{ github.ref_name }}.file \
-            -var="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
-            -var="bucket=${{ secrets.BUCKET }}" \
-            -var="access_key=${{ secrets.ACCESS_KEY }}" \
-            -var="secret_key=${{ secrets.SECRET_KEY }}"
+          terraform apply plan_${{ github.ref_name }}.file
