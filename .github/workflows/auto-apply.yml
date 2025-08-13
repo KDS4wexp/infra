@@ -62,4 +62,4 @@ jobs:
             -var="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
             -var="bucket=${{ secrets.BUCKET }}" \
             -var="access_key=${{ secrets.ACCESS_KEY }}" \
-            -var="secret_key=${{ secrets.SECRET_KEY }}
+            -var="secret_key=${{ secrets.SECRET_KEY }}"
