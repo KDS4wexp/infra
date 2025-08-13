@@ -298,7 +298,7 @@ resource "yandex_compute_instance" "m_node" {                                   
     security_group_ids = [yandex_vpc_security_group.bastion_security.id]
   }
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.public_ssh_key}"
   }
 }
 resource "yandex_compute_instance" "w_node_0" {                                             # Создаем worker-node-0
@@ -319,7 +319,7 @@ resource "yandex_compute_instance" "w_node_0" {                                 
     security_group_ids = [yandex_vpc_security_group.bastion_security.id]
   }
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.public_ssh_key}"
   }
 }
 resource "yandex_compute_instance" "w_node_1" {                                             # Создаем worker-node-1
@@ -340,6 +340,6 @@ resource "yandex_compute_instance" "w_node_1" {                                 
     security_group_ids = [yandex_vpc_security_group.bastion_security.id]
   }
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.public_ssh_key}"
   }
 }
