@@ -42,7 +42,7 @@ jobs:
       - name: Terraform Plan
         working-directory: ./terraform/${{ github.ref_name }}
         run: |
-          terraform plan -input=false -compact-warnings -out=plan_${{ github.ref_name }}.file
+          terraform plan -input=false -compact-warnings -out=plan.file
       
       - name: Save Plan
         uses: actions/upload-artifact@v4
