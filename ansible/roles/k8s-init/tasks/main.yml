@@ -18,8 +18,16 @@
   become: false
   command: kubectl create -f https://calico-v3-25.netlify.app/archive/v3.25/manifests/calico.yaml
 
-- name: symlink cni dir for debian
+- name: Symlink cni dir for debian
   file:
     src: /opt/cni/bin
     dest: /usr/lib/cni
     state: link
+
+- name: Generate join command for master nodes
+  shell: kubeadm token create --control-plane --print-join-command
+  register: join_master_command_raw
+
+- name: Generate join command for worker nodes
+  shell: kubeadm token create --control-plane --print-join-command
+  register: join_worker_command_raw

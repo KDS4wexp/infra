@@ -1,6 +1,0 @@
----
-- name: Reset control plane
-  hosts: k8s-master
-  become: true
-  roles: 
-  - k8s-reset

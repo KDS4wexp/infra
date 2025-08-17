@@ -1,8 +1,0 @@
----
-- name: Check connect on my nodes
-  hosts: all
-  become: true
-
-  tasks:
-  - name: Ping
-    ping:

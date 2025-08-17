@@ -1,6 +1,0 @@
----
-- name: Init control plane
-  hosts: k8s-master
-  become: true
-  roles: 
-  - k8s-init
