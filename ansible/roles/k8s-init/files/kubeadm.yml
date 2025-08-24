@@ -2,7 +2,11 @@
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1beta4
 kubernetesVersion: v1.32.0
+controlPlaneEndpoint: "haproxy.private:6443" # haproxy address
+networking:
+  podSubnet: "192.168.0.0/16" #calico default subnet
 ---
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 cgroupDriver: systemd
+
