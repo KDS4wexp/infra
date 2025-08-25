@@ -7,13 +7,12 @@ on:
     types:
       - closed
     branches: 
-      - main
+      - prod
       - dev
 
 env:
   TF_VAR_token: ${{ secrets.TOKEN }}
   TF_VAR_cloud: ${{ secrets.CLOUD }}
-  TF_VAR_folder: ${{ secrets.FOLDER }}
   TF_VAR_domain: ${{ secrets.DOMAIN }}
   TF_VAR_public_ssh_key: ${{ secrets.PUBLIC_SSH_KEY }}
 
@@ -28,12 +27,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
 
+      - name: Determine Terraform directory
+        id: tf_dir
+        run: |
+          if [[ ${{ github.ref_name }} == prod ]]; then
+            echo "dir=prod" >> $GITHUB_OUTPUT
+          else
+            echo "dir=dev" >> $GITHUB_OUTPUT
+
       - name: Terraform fmt
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Trraform Init
-        working-directory: ./terraform/${{ github.ref_name }}
+      - name: Terraform Init
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: |
           terraform init -input=false \
             -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
@@ -42,10 +50,11 @@ jobs:
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
 
       - name: Terraform Validate
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: terraform validate -no-color
 
       - name: Terraform Plan
-        working-directory: ./terraform/${{ github.ref_name }}
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: |
           terraform plan -input=false -compact-warnings -out=plan.file
       
@@ -53,29 +62,42 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plan.file
-          path: terraform/${{ github.ref_name }}/plan.file
+          path: terraform/${{ steps.tf_dir.outputs.dir }}/plan.file
           retention-days: 7
 
   apply:
     name: apply
     needs: check
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_reqquest'
+    if: github.event.pull_request.merged == true
     environment: ${{ github.ref_name }}
     env:
       TF_VAR_folder: ${{ secrets.FOLDER }}
     steps:
-      - name: Trraform Init
-        working-directory: ./terraform/${{ github.ref_name }}
+      - name: Determine Terraform directory
+        id: tf_dir
+        run: |
+          if [[ ${{ github.ref_name }} == prod ]]; then
+            echo "dir=prod" >> $GITHUB_OUTPUT
+          else
+            echo "dir=dev" >> $GITHUB_OUTPUT
+
+      - name: Terraform Init
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: |
           terraform init -input=false \
-            -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
+            -backend-config="key=terraform/${{ steps.tf_dir.outputs.dir }}/terraform.tfstate" \
             -backend-config="bucket=${{ secrets.BUCKET }}" \
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
             
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: plan.file
+          path: ./terraform/${{ steps.tf_dir.outputs.dir }}
+
       - name: Terraform Apply
-        if: github.event.pull_request.merged == true
-        working-directory: ./terraform/${{ github.ref_name }}
+        working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
         run: |
           terraform apply -input=false plan.file
