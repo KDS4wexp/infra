@@ -81,6 +81,7 @@ jobs:
             echo "dir=prod" >> $GITHUB_OUTPUT
           else
             echo "dir=dev" >> $GITHUB_OUTPUT
+          fi
 
       - name: Terraform Init
         working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
