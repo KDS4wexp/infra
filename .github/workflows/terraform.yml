@@ -2,6 +2,7 @@
 name: Terraform Auto Apply
 
 on:
+  push:
   pull_request:
     types:
       - closed
@@ -17,7 +18,8 @@ env:
   TF_VAR_public_ssh_key: ${{ secrets.PUBLIC_SSH_KEY }}
 
 jobs:
-  auto:
+  check:
+    name: check
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
     env:
@@ -54,6 +56,24 @@ jobs:
           path: terraform/${{ github.ref_name }}/plan.file
           retention-days: 7
 
+  apply:
+    name: apply
+    needs: check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_reqquest'
+    environment: ${{ github.ref_name }}
+    env:
+      TF_VAR_folder: ${{ secrets.FOLDER }}
+    steps:
+      - name: Trraform Init
+        working-directory: ./terraform/${{ github.ref_name }}
+        run: |
+          terraform init -input=false \
+            -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
+            -backend-config="bucket=${{ secrets.BUCKET }}" \
+            -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+            
       - name: Terraform Apply
         if: github.event.pull_request.merged == true
         working-directory: ./terraform/${{ github.ref_name }}
