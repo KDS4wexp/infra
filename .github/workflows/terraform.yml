@@ -75,6 +75,9 @@ jobs:
     env:
       TF_VAR_folder: ${{ secrets.FOLDER }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
       - name: Determine Terraform directory
         id: tf_dir
         run: |
