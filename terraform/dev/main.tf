@@ -259,8 +259,8 @@ resource "yandex_compute_instance" "m_node_a_0" {                               
   }
 }
 
-resource "yandex_compute_instance" "w_node_a" {                                             # Создаем worker-node-0
-  name = "w-node-a"                                                                         # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
+resource "yandex_compute_instance" "w_node_0" {                                             # Создаем worker-node-0
+  name = "w-node-0"                                                                         # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
   zone = "ru-central1-a"                                                                    # образ машины - debian 12
   hostname = "w-node-0"                                                                    
   resources {                                                                                                                        
