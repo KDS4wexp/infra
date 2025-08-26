@@ -52,7 +52,7 @@ jobs:
 
       - name: Terraform Validate
         working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
-        run: terraform validate -no-color
+        run: terraform validate -no-color -json
 
       - name: Terraform Plan
         working-directory: ./terraform/${{ steps.tf_dir.outputs.dir }}
