@@ -12,15 +12,12 @@ on:
 jobs:
   auto:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    strategy:
+      matrix:
+        layer: [platform-01]
+        environment: [simple_dev]
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Ansible
-        run: |
-          apt update && apt install ansible
-
       - name: Auto playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i ./inventories/${{ github.ref_name }}/inventory playbook.yml
+          ansible-playbook -i 

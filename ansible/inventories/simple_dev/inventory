@@ -2,8 +2,7 @@
 bastion.kds4wexp1.ru
 
 [k8s-master]
-m-node-a-0.private
-
+m-node.private
 
 [k8s-worker]
 w-node-0.private
