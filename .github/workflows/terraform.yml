@@ -3,6 +3,9 @@ name: Terraform Auto Apply
 
 on:
   push:
+    branches:
+      - feat/*
+      - fix/*
   pull_request:
     types:
       - closed
