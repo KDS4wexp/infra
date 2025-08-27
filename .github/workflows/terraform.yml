@@ -105,11 +105,11 @@ jobs:
           retention-days: 7
 
   apply:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'prod')
     needs: [check-dev, check-prod]
     name: apply
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    environment: ${{ github.event.pull_request.base.ref }}
     env:
       TF_VAR_folder: ${{ secrets.FOLDER }}
     steps:
@@ -119,7 +119,7 @@ jobs:
       - name: Determine Terraform directory
         id: tf_env
         run: |
-          if [[ ${{ github.ref_name }} == prod ]]; then
+          if [[ ${{ github.event.pull_request.base.ref }} == prod ]]; then
             echo "env=prod" >> $GITHUB_OUTPUT
           else
             echo "env=dev" >> $GITHUB_OUTPUT
