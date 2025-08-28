@@ -104,17 +104,8 @@ jobs:
           path: terraform/${{ env.DIR }}/plan.file
           retention-days: 7
 
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Debug context
-      run: |
-        echo "Merged: ${{ github.event.pull_request.merged }}"
-        echo "Base ref: ${{ github.event.pull_request.base.ref }}"
-
   apply:
     if: github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'prod')
-    needs: [check-dev, check-prod]
     name: apply
     runs-on: ubuntu-latest
     environment: ${{ github.event.pull_request.base.ref }}
