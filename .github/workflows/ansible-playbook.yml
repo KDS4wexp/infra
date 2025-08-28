@@ -2,6 +2,11 @@
 name: Ansible auto playbooks
 
 on:
+  workflow_run:
+    workflows: [terraform]
+    types:
+      - completed
+      
   pull_request:
     types:
       - closed
@@ -18,7 +23,7 @@ jobs:
 
       - name: Install Ansible
         run: |
-          apt update && apt install ansible
+          sudo apt update && sudo apt install ansible
 
       - name: Auto playbook
         working-directory: ./ansible/

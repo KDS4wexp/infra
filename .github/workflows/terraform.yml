@@ -1,5 +1,5 @@
 ---
-name: Terraform Auto Apply
+name: Terraform
 
 on:
   push:
