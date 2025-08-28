@@ -104,31 +104,24 @@ jobs:
           path: terraform/${{ env.DIR }}/plan.file
           retention-days: 7
 
-  apply:
-    if: github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'prod')
-    name: apply
+  apply-dev:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    name: apply-dev
+    needs: check-dev
     runs-on: ubuntu-latest
-    environment: ${{ github.event.pull_request.base.ref }}
+    environment: dev
     env:
       TF_VAR_folder: ${{ secrets.FOLDER }}
+      DIR: dev
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
 
-      - name: Determine Terraform directory
-        id: tf_env
-        run: |
-          if [[ ${{ github.event.pull_request.base.ref }} == prod ]]; then
-            echo "env=prod" >> $GITHUB_OUTPUT
-          else
-            echo "env=dev" >> $GITHUB_OUTPUT
-          fi
-
       - name: Terraform Init
-        working-directory: ./terraform/${{ steps.tf_env.outputs.env }}
+        working-directory: ./terraform/${{ env.DIR }}
         run: |
           terraform init -input=false \
-            -backend-config="key=terraform/${{ steps.tf_env.outputs.env }}/terraform.tfstate" \
+            -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
             -backend-config="bucket=${{ secrets.BUCKET }}" \
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
@@ -137,9 +130,42 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: plan.file
-          path: ./terraform/${{ steps.tf_env.outputs.env }}
+          path: ./terraform/${{ env.DIR }}
 
       - name: Terraform Apply
-        working-directory: ./terraform/${{ steps.tf_env.outputs.env }}
+        working-directory: ./terraform/${{ env.DIR }}
         run: |
           terraform apply -input=false plan.file
+
+  apply-prod:
+      if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'prod'
+      name: apply-prod
+      needs: check-prod
+      runs-on: ubuntu-latest
+      environment: prod
+      env:
+        TF_VAR_folder: ${{ secrets.FOLDER }}
+        DIR: prod
+      steps:
+        - uses: actions/checkout@v4
+        - uses: hashicorp/setup-terraform@v3
+
+        - name: Terraform Init
+          working-directory: ./terraform/${{ env.DIR }}
+          run: |
+            terraform init -input=false \
+              -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
+              -backend-config="bucket=${{ secrets.BUCKET }}" \
+              -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
+              -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+              
+        - name: Download Plan
+          uses: actions/download-artifact@v4
+          with:
+            name: plan.file
+            path: ./terraform/${{ env.DIR }}
+
+        - name: Terraform Apply
+          working-directory: ./terraform/${{ env.DIR }}
+          run: |
+            terraform apply -input=false plan.file
