@@ -1,0 +1,32 @@
+---
+name: Ansible
+
+on:
+  workflow_run:
+    workflows: [terraform]
+    types:
+      - completed
+    
+jobs:
+  check-dev:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.14.0rc3-alpine3.22
+    environment: dev
+    env:
+      DIR: dev
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ansible/ansible-lint@main
+        with:
+          working_directory: ./ansible/
+
+      - name: Setup Ansible
+        run: |
+          python3 -m pip install ansible
+
+      - name: Auto playbook
+        working-directory: ./ansible/
+        run: |
+          ansible-playbook -i ./inventories/${{ env.DIR }}/inventory playbook.yml

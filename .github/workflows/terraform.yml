@@ -26,8 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
-          TF_VAR_folder: ${{ secrets.FOLDER }}
-          DIR: dev
+      TF_VAR_folder: ${{ secrets.FOLDER }}
+      DIR: dev
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
@@ -68,8 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     env:
-          TF_VAR_folder: ${{ secrets.FOLDER }}
-          DIR: prod
+      TF_VAR_folder: ${{ secrets.FOLDER }}
+      DIR: prod
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
