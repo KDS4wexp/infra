@@ -2,16 +2,7 @@
 name: Terraform
 
 on:
-  push:
-    branches:
-      - feat/*
-      - fix/*
-  pull_request:
-    types:
-      - closed
-    branches: 
-      - prod
-      - dev
+  workflow_call:
 
 env:
   TF_VAR_token: ${{ secrets.TOKEN }}

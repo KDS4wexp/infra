@@ -1,0 +1,22 @@
+---
+name: Main
+
+on:
+  push:
+    branches:
+      - feat/*
+      - fix/*
+  pull_request:
+    types:
+      - closed
+    branches:
+      - prod
+      - dev
+
+jobs:
+  terraform:
+    uses: ./.github/workflows/terraform.yml
+
+  ansible:
+    needs: terraform
+    uses: ./.github/workflows/ansible.yml

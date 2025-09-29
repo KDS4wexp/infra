@@ -2,10 +2,7 @@
 name: Ansible
 
 on:
-  workflow_run:
-    workflows: [Terraform]
-    types:
-      - completed
+  workflow_call:
     
 jobs:
   check-dev:
