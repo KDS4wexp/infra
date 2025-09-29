@@ -258,6 +258,7 @@ resource "yandex_compute_instance" "haproxy" {                                  
   metadata = {
     ssh-keys = "ubuntu:${var.public_ssh_key}"
   }
+}
 ///
 
 resource "yandex_compute_instance" "m_node_a_0" {                                             # Создаем master-node
@@ -327,5 +328,4 @@ resource "yandex_compute_instance" "w_node_1" {                                 
   metadata = {
     ssh-keys = "ubuntu:${var.public_ssh_key}"
   }
-}
 }
