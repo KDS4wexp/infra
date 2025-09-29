@@ -3,7 +3,7 @@ name: Ansible
 
 on:
   workflow_run:
-    workflows: [terraform]
+    workflows: [Terraform]
     types:
       - completed
     
