@@ -1,0 +1,69 @@
+---
+name: Terraform Plan
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+    secrets:
+      TOKEN:
+        required: true
+      CLOUD:
+        required: true
+      FOLDER:
+        required: true
+      DOMAIN:
+        required: true
+      PUBLIC_SSH_KEY:
+        required: true
+      DIR:
+        required: true
+
+jobs:
+  check:
+    name: Plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env: 
+      TF_VAR_token: ${{ secrets.TOKEN }}
+      TF_VAR_cloud: ${{ secrets.CLOUD }}
+      TF_VAR_folder: ${{ secrets.FOLDER }}
+      TF_VAR_domain: ${{ secrets.DOMAIN }}
+      TF_VAR_public_ssh_key: ${{ secrets.PUBLIC_SSH_KEY }}
+      DIR: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      
+      - name: Terraform fmt
+        working-directory: ./terraform/${{ env.DIR }}
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        working-directory: ./terraform/${{ env.DIR }}
+        run: |
+          terraform init -input=false \
+            -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
+            -backend-config="bucket=${{ secrets.BUCKET }}" \
+            -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+
+      - name: Terraform Validate
+        working-directory: ./terraform/${{ env.DIR }}
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        working-directory: ./terraform/${{ env.DIR }}
+        run: |
+          terraform plan -input=false -compact-warnings -out=plan.file
+      
+      - name: Save Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan.file
+          path: terraform/${{ env.DIR }}/plan.file
+          retention-days: 7

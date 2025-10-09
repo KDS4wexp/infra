@@ -14,9 +14,21 @@ on:
       - dev
 
 jobs:
-  terraform:
-    uses: ./.github/workflows/terraform.yml
+  terraform-plan:
+    name: Terraform Plan
+    uses: KDS4wexp/infra/.github/workflows/terraform_plan.yml
+    with:
+      environment: ${{ github.head_ref || github.ref_name }} 
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      CLOUD: ${{ secrets.CLOUD }}
+      FOLDER: ${{ secrets.FOLDER }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      PUBLIC_SSH_KEY: ${{ secrets.PUBLIC_SSH_KEY }}
 
-  ansible:
-    needs: terraform
-    uses: ./.github/workflows/ansible.yml
+  # terraform-apply:
+  #   uses: ./.github/workflows/terraform_apply.yml
+
+  # ansible:
+  #   needs: terraform-apply
+  #   uses: ./.github/workflows/ansible.yml

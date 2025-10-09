@@ -1,0 +1,33 @@
+---
+name: Terraform Apply
+
+on:
+  workflow_call:
+  
+jobs:
+  apply:
+    name: apply
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ./terraform/${{ env.DIR }}
+        run: |
+          terraform init -input=false \
+            -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
+            -backend-config="bucket=${{ secrets.BUCKET }}" \
+            -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+            
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: plan.file
+          path: ./terraform/${{ env.DIR }}
+
+      - name: Terraform Apply
+        working-directory: ./terraform/${{ env.DIR }}
+        run: |
+          terraform apply -input=false plan.file
