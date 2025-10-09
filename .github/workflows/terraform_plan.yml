@@ -18,8 +18,6 @@ on:
         required: true
       PUBLIC_SSH_KEY:
         required: true
-      DIR:
-        required: true
 
 jobs:
   check:

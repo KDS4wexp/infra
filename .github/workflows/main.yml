@@ -16,7 +16,7 @@ on:
 jobs:
   terraform-plan:
     name: Terraform Plan
-    uses: KDS4wexp/infra/.github/workflows/terraform_plan.yml
+    uses: ./.github/workflows/terraform_plan.yml
     with:
       environment: ${{ github.head_ref || github.ref_name }} 
     secrets:
