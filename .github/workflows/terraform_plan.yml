@@ -18,6 +18,12 @@ on:
         required: true
       PUBLIC_SSH_KEY:
         required: true
+      BUCKET:
+        required: true
+      ACCESS_KEY:
+        required: true
+      SECRET_KEY:
+        required: true
 
 jobs:
   check:
@@ -30,7 +36,9 @@ jobs:
       TF_VAR_folder: ${{ secrets.FOLDER }}
       TF_VAR_domain: ${{ secrets.DOMAIN }}
       TF_VAR_public_ssh_key: ${{ secrets.PUBLIC_SSH_KEY }}
-      DIR: ${{ inputs.environment }}
+      BUCKET: ${{ secrets.BUCKET }}
+      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +53,7 @@ jobs:
         working-directory: ./terraform/
         run: |
           terraform init -input=false \
-            -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
+            -backend-config="key=terraform/${{ inputs.environment }}/terraform.tfstate" \
             -backend-config="bucket=${{ secrets.BUCKET }}" \
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"

@@ -14,31 +14,36 @@ on:
       - dev
 
 jobs:
-  terraform-plan-dev:
-    if: (github.head_ref || github.ref_name) != 'prod' 
-    name: Terraform Plan
-    uses: ./.github/workflows/terraform_plan.yml
-    with:
-      environment: dev
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      CLOUD: ${{ secrets.CLOUD }}
-      FOLDER: ${{ secrets.FOLDER }}
-      DOMAIN: ${{ secrets.DOMAIN }}
-      PUBLIC_SSH_KEY: ${{ secrets.PUBLIC_SSH_KEY }}
+  setenv:
+    name: Set Environment
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.setenv.outputs.env }}
+    steps:
+      - name: Set env
+        id: setenv
+        run: |
+          if [[ (github.head_ref || github.ref_name) == 'prod' ]]; then
+            echo "env=prod" >> $GITHUB_OUTPUT
+          else
+            echo "env=dev" >> $GITHUB_OUTPUT
+          fi
 
-  terraform-plan-prod:
-    if: (github.head_ref || github.ref_name) == 'prod' 
-    name: Terraform Plan
+  terraform-plan:
+    name: Terraform Plan dev
+    needs: setenv
     uses: ./.github/workflows/terraform_plan.yml
     with:
-      environment: prod
+      environment: ${{ needs.setenv.outputs.env }}
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       CLOUD: ${{ secrets.CLOUD }}
       FOLDER: ${{ secrets.FOLDER }}
       DOMAIN: ${{ secrets.DOMAIN }}
       PUBLIC_SSH_KEY: ${{ secrets.PUBLIC_SSH_KEY }}
+      BUCKET: ${{ secrets.BUCKET }}
+      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
   # terraform-apply:
   #   uses: ./.github/workflows/terraform_apply.yml
