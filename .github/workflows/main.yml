@@ -31,7 +31,7 @@ jobs:
           fi
 
   terraform-plan:
-    name: Terraform Plan dev
+    name: Terraform Plan for ${{ needs.setenv.outputs.env }}
     needs: setenv
     uses: ./.github/workflows/terraform_plan.yml
     with:
