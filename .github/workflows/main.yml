@@ -23,7 +23,8 @@ jobs:
       - name: Set env
         id: setenv
         run: |
-          if [[ (github.head_ref || github.ref_name) == 'prod' ]]; then
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          if [[ "$BRANCH" == "prod" ]]; then
             echo "env=prod" >> $GITHUB_OUTPUT
           else
             echo "env=dev" >> $GITHUB_OUTPUT
