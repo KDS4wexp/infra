@@ -37,12 +37,12 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
       
       - name: Terraform fmt
-        working-directory: ./terraform/${{ env.DIR }}
+        working-directory: ./terraform/
         run: terraform fmt -check
         continue-on-error: true
 
       - name: Terraform Init
-        working-directory: ./terraform/${{ env.DIR }}
+        working-directory: ./terraform/
         run: |
           terraform init -input=false \
             -backend-config="key=terraform/${{ env.DIR }}/terraform.tfstate" \
@@ -51,11 +51,11 @@ jobs:
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
 
       - name: Terraform Validate
-        working-directory: ./terraform/${{ env.DIR }}
+        working-directory: ./terraform/
         run: terraform validate -no-color
 
       - name: Terraform Plan
-        working-directory: ./terraform/${{ env.DIR }}
+        working-directory: ./terraform/
         run: |
           terraform plan -input=false -compact-warnings -out=plan.file
       
@@ -63,5 +63,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plan.file
-          path: terraform/${{ env.DIR }}/plan.file
+          path: terraform/plan.file
           retention-days: 7
