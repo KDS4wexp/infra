@@ -14,11 +14,25 @@ on:
       - dev
 
 jobs:
-  terraform-plan:
+  terraform-plan-dev:
+    if: (github.head_ref || github.ref_name) != 'prod' 
     name: Terraform Plan
     uses: ./.github/workflows/terraform_plan.yml
     with:
-      environment: ${{ github.head_ref || github.ref_name }} 
+      environment: dev
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      CLOUD: ${{ secrets.CLOUD }}
+      FOLDER: ${{ secrets.FOLDER }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      PUBLIC_SSH_KEY: ${{ secrets.PUBLIC_SSH_KEY }}
+
+  terraform-plan-prod:
+    if: (github.head_ref || github.ref_name) == 'prod' 
+    name: Terraform Plan
+    uses: ./.github/workflows/terraform_plan.yml
+    with:
+      environment: prod
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       CLOUD: ${{ secrets.CLOUD }}
