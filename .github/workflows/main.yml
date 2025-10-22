@@ -31,7 +31,7 @@ jobs:
           fi
 
   terraform-plan:
-    name: Terraform Plan for ${{ needs.setenv.outputs.env }}
+    name: Terraform for ${{ needs.setenv.outputs.env }}
     needs: setenv
     uses: ./.github/workflows/terraform_plan.yml
     with:
@@ -46,8 +46,13 @@ jobs:
       ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
-  # terraform-apply:
-  #   uses: ./.github/workflows/terraform_apply.yml
+  terraform-apply:
+    name: Terraform for ${{ needs.setenv.outputs.env }}
+    needs: setenv
+    uses: ./.github/workflows/terraform_apply.yml
+    with:
+      environment: ${{ needs.setenv.outputs.env }}
+
 
   # ansible:
   #   needs: terraform-apply
