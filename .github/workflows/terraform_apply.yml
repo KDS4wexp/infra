@@ -7,25 +7,51 @@ on:
       environment:
         type: string
         required: true
-  
+    secrets:
+      TOKEN:
+        required: true
+      CLOUD:
+        required: true
+      FOLDER:
+        required: true
+      DOMAIN:
+        required: true
+      PUBLIC_SSH_KEY:
+        required: true
+      BUCKET:
+        required: true
+      ACCESS_KEY:
+        required: true
+      SECRET_KEY:
+        required: true
+
 jobs:
   apply:
     name: Apply
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    
+    env:
+      TF_VAR_token: ${{ secrets.TOKEN }}
+      TF_VAR_cloud: ${{ secrets.CLOUD }}
+      TF_VAR_folder: ${{ secrets.FOLDER }}
+      TF_VAR_domain: ${{ secrets.DOMAIN }}
+      TF_VAR_public_ssh_key: ${{ secrets.PUBLIC_SSH_KEY }}
+      BUCKET: ${{ secrets.BUCKET }}
+      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
 
-      # - name: Terraform Init
-      #   working-directory: ./terraform/
-      #   run: |
-      #     terraform init -input=false \
-      #       -backend-config="key=terraform/${{ inputs.environment }}/terraform.tfstate" \
-      #       -backend-config="bucket=${{ secrets.BUCKET }}" \
-      #       -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
-      #       -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+      - name: Terraform Init
+        working-directory: ./terraform/
+        run: |
+          terraform init -input=false \
+            -backend-config="key=terraform/${{ inputs.environment }}/terraform.tfstate" \
+            -backend-config="bucket=${{ secrets.BUCKET }}" \
+            -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
             
       - name: Download Plan
         uses: actions/download-artifact@v4
