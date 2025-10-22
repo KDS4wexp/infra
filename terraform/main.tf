@@ -1,15 +1,15 @@
-resource "yandex_vpc_network" "network" {                                                   # Создаем сеть network
+resource "yandex_vpc_network" "network" {                                                   
   name = "network"
 }
 
-resource "yandex_vpc_subnet" "public_a" {                                                   # Создаем подсеть в network с зоной a и cidr 10.0.0.0/24
+resource "yandex_vpc_subnet" "public_a" {                                                   
   name = "public_a"
   v4_cidr_blocks = ["10.0.0.0/24"]
   zone = "ru-central1-a"
   network_id = yandex_vpc_network.network.id
 }
 
-resource "yandex_vpc_subnet" "private_a" {                                                  # Создаем подсеть в network с зоной a и cidr 10.0.1.0/24
+resource "yandex_vpc_subnet" "private_a" {                                                 
   name = "private_a"
   v4_cidr_blocks = ["10.0.1.0/24"]
   zone = "ru-central1-a"
@@ -17,13 +17,13 @@ resource "yandex_vpc_subnet" "private_a" {                                      
   route_table_id = yandex_vpc_route_table.route.id
 }
 
-resource "yandex_vpc_address" "bastion_ip" {                                                # Выделяем для bastion host белый ip
+resource "yandex_vpc_address" "bastion_ip" {                                                
     external_ipv4_address {
     zone_id = "ru-central1-a"
   }
 }
 
-resource "yandex_vpc_route_table" "route" {                                                 # Создаем таблицу маршрутизации, которая предоставляет нодам доступ к внешней сети
+resource "yandex_vpc_route_table" "route" {                                                 
   name = "route"
   network_id = yandex_vpc_network.network.id
   static_route {
@@ -32,24 +32,24 @@ resource "yandex_vpc_route_table" "route" {                                     
   }
 }
 
-resource "yandex_vpc_gateway" "gateway" {                                                   # Создаем шлюз для выхода во внешнюю сеть
+resource "yandex_vpc_gateway" "gateway" {                                                   
   name = "gateway"
   shared_egress_gateway {}
 }
 
-resource "yandex_dns_zone" "public_zone" {                                                  # Создаем публичную днс зону
+resource "yandex_dns_zone" "public_zone" {                                                  
   name = "public"
   zone = "${var.domain}."
   public = true
 }
 
-resource "yandex_dns_zone" "private_zone" {                                                 # Создаем приватную днс зону и подключаем к network
+resource "yandex_dns_zone" "private_zone" {                                                 
   name = "private"
   zone = "private."
   private_networks = [yandex_vpc_network.network.id]
 }
 
-resource "yandex_cm_certificate" "cert" {                                                   # Создаем сертификат, для этого нужно сделать CNAME запись в днс  
+resource "yandex_cm_certificate" "cert" {                                                     
   name = "cert"
   domains = [ var.domain ]
   managed {
@@ -57,7 +57,7 @@ resource "yandex_cm_certificate" "cert" {                                       
   }
 }
 
-resource "yandex_dns_recordset" "rs_cert" {                                                    # Добавляем в публичную зону DNS запись CNAME для сертификата
+resource "yandex_dns_recordset" "rs_cert" {                                                   
   zone_id = yandex_dns_zone.public_zone.id
   name = yandex_cm_certificate.cert.challenges.0.dns_name
   type = yandex_cm_certificate.cert.challenges.0.dns_type
@@ -65,7 +65,7 @@ resource "yandex_dns_recordset" "rs_cert" {                                     
   data = [yandex_cm_certificate.cert.challenges.0.dns_value]
 }
 
-resource "yandex_dns_recordset" "rs_bastion" {                                              # Добавляем запись для bastion
+resource "yandex_dns_recordset" "rs_bastion" {                                             
   name = "bastion"
   zone_id = yandex_dns_zone.public_zone.id
   type = "A"
@@ -73,7 +73,7 @@ resource "yandex_dns_recordset" "rs_bastion" {                                  
   data = [yandex_compute_instance.bastion.network_interface.0.nat_ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_bastion_gitlab" {                                       # Добавляем запись для bastion чтобы перенаправлять запросы на gitlab
+resource "yandex_dns_recordset" "rs_bastion_gitlab" {                                      
   name = "gitlab"
   zone_id = yandex_dns_zone.public_zone.id
   type = "A"
@@ -81,7 +81,7 @@ resource "yandex_dns_recordset" "rs_bastion_gitlab" {                           
   data = [yandex_compute_instance.bastion.network_interface.0.nat_ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_gitlab" {                                               # Добавляем запись для gitlab  
+resource "yandex_dns_recordset" "rs_gitlab" {                                               
   name = "gitlab"
   zone_id = yandex_dns_zone.private_zone.id
   type = "A"
@@ -89,7 +89,7 @@ resource "yandex_dns_recordset" "rs_gitlab" {                                   
   data = [yandex_compute_instance.gitlab.network_interface.0.ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_m_node_a_0" {                                               # Добавляем запись для master-node-0 
+resource "yandex_dns_recordset" "rs_m_node_a_0" {                                               
   name = "m-node-a-0"
   zone_id = yandex_dns_zone.private_zone.id
   type = "A"
@@ -97,7 +97,7 @@ resource "yandex_dns_recordset" "rs_m_node_a_0" {                               
   data = [yandex_compute_instance.m_node_a_0.network_interface.0.ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_w_node_0" {                                             # Добавляем запись для worker-node-0 
+resource "yandex_dns_recordset" "rs_w_node_0" {                                             
   name = "w-node-0"
   zone_id = yandex_dns_zone.private_zone.id
   type = "A"
@@ -105,7 +105,7 @@ resource "yandex_dns_recordset" "rs_w_node_0" {                                 
   data = [yandex_compute_instance.w_node_0.network_interface.0.ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_w_node_1" {                                             # Добавляем запись для worker-node-1 
+resource "yandex_dns_recordset" "rs_w_node_1" {                                             
   name = "w-node-1"
   zone_id = yandex_dns_zone.private_zone.id
   type = "A"
@@ -113,7 +113,7 @@ resource "yandex_dns_recordset" "rs_w_node_1" {                                 
   data = [yandex_compute_instance.w_node_1.network_interface.0.ip_address]
 }
 
-resource "yandex_dns_recordset" "rs_haproxy" {                                             # Добавляем запись для haproxy
+resource "yandex_dns_recordset" "rs_haproxy" {                                             
   name = "haproxy"
   zone_id = yandex_dns_zone.private_zone.id
   type = "A"
@@ -121,9 +121,9 @@ resource "yandex_dns_recordset" "rs_haproxy" {                                  
   data = [yandex_compute_instance.haproxy.network_interface.0.ip_address]
 }
 
-resource "yandex_vpc_security_group" "bastion_security"{                                  # Создаем группу безопасности для сети network
-  name = "bastion_security"                                                               # разрешаем входящий трафик только по 22, 53, 80, 443 портам 
-  network_id = yandex_vpc_network.network.id                                              # исходящий трафик разрешен на любом порту
+resource "yandex_vpc_security_group" "bastion_security"{                                  
+  name = "bastion_security"                                                               
+  network_id = yandex_vpc_network.network.id                                              
   ingress {
     description = "SSH"
     protocol = "TCP"
@@ -161,9 +161,10 @@ resource "yandex_vpc_security_group" "bastion_security"{                        
   }
 }
 
-resource "yandex_compute_instance" "bastion" {                                            # Создаем bastion host для подключения к внутренней инфре извне
-  name = "bastion"                                                                        # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                  # образ машины - debian 12
+#checkov:skip=CKV_YC_2: Bastion host требует публичного IP
+resource "yandex_compute_instance" "bastion" {                                            
+  name = "bastion"                                                                       
+  zone = "ru-central1-a"                                                                  
   hostname = "bastion"                                                                  
   resources {                                                                                                                         
     cores = 2                                                                   
@@ -191,9 +192,9 @@ resource "yandex_compute_instance" "bastion" {                                  
   }
 }
 
-resource "yandex_compute_instance" "vault" {                                            # Создаем hashi vault host для менеджмента секретов
-  name = "vault"                                                                        # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                # образ машины - debian 12
+resource "yandex_compute_instance" "vault" {                                            
+  name = "vault"                                                                        
+  zone = "ru-central1-a"                                                                
   hostname = "vault"                                                                  
   resources {                                                                                                                         
     cores = 2                                                                   
@@ -214,9 +215,9 @@ resource "yandex_compute_instance" "vault" {                                    
   }
 }
 
-resource "yandex_compute_instance" "gitlab" {                                               # Создаем gitlab host
-  name = "gitlab"                                                                           # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                    # образ машины - debian 12
+resource "yandex_compute_instance" "gitlab" {                                               
+  name = "gitlab"                                                                           
+  zone = "ru-central1-a"                                                                    
   hostname = "gitlab"                                                                     
   resources {                                                                                                                        
     cores = 4                                                                   
@@ -238,9 +239,9 @@ resource "yandex_compute_instance" "gitlab" {                                   
   }
 }
 
-resource "yandex_compute_instance" "haproxy" {                                            # Создаем haproxy host для менеджмента секретов
-  name = "haproxy"                                                                        # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                # образ машины - debian 12
+resource "yandex_compute_instance" "haproxy" {                                            
+  name = "haproxy"                                                                        
+  zone = "ru-central1-a"                                                               
   hostname = "haproxy"                                                                  
   resources {                                                                                                                         
     cores = 2                                                                   
@@ -262,9 +263,9 @@ resource "yandex_compute_instance" "haproxy" {                                  
 }
 ///
 
-resource "yandex_compute_instance" "m_node_a_0" {                                             # Создаем master-node
-  name = "m-node-a-0"                                                                         # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                  # образ машины - debian 12
+resource "yandex_compute_instance" "m_node_a_0" {                                             
+  name = "m-node-a-0"                                                                        
+  zone = "ru-central1-a"                                                                  
   hostname = "m-node-a-0"                                                                  
   resources {                                                                                                                        
     cores = 2                                                                   
@@ -285,9 +286,9 @@ resource "yandex_compute_instance" "m_node_a_0" {                               
   }
 }
 
-resource "yandex_compute_instance" "w_node_0" {                                             # Создаем worker-node-0
-  name = "w-node-0"                                                                         # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                    # образ машины - debian 12
+resource "yandex_compute_instance" "w_node_0" {                                            
+  name = "w-node-0"                                                                         
+  zone = "ru-central1-a"                                                                    
   hostname = "w-node-0"                                                                    
   resources {                                                                                                                        
     cores = 2                                                                   
@@ -308,9 +309,9 @@ resource "yandex_compute_instance" "w_node_0" {                                 
   }
 }
 
-resource "yandex_compute_instance" "w_node_1" {                                             # Создаем worker-node-1
-  name = "w-node-1"                                                                         # необходимо предварительно сгенерировать пару rsa ключей в домашней дериктории
-  zone = "ru-central1-a"                                                                    # образ машины - debian 12
+resource "yandex_compute_instance" "w_node_1" {                                            
+  name = "w-node-1"                                                                         
+  zone = "ru-central1-a"                                                                    
   hostname = "w-node-1"                                                                    
   resources {                                                                                                                        
     cores = 2                                                                   
