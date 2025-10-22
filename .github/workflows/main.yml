@@ -31,10 +31,10 @@ jobs:
           fi
 
   terraform-checkov:
-    name: Terraform checkov
+    name: Terraform Checkov
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout Repo
         uses: actions/checkout@master
 
       - name: Checkov Terraform
@@ -44,7 +44,9 @@ jobs:
 
   terraform-plan:
     name: Terraform for ${{ needs.setenv.outputs.env }}
-    needs: setenv
+    needs: 
+      - setenv
+      - terraform-checkov
     uses: ./.github/workflows/terraform_plan.yml
     with:
       environment: ${{ needs.setenv.outputs.env }}
