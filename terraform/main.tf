@@ -161,7 +161,7 @@ resource "yandex_vpc_security_group" "bastion_security"{
   }
 }
 
-#checkov:skip=CKV_YC_2: Bastion host требует публичного IP
+# checkov:skip=CKV_YC_2: Bastion host требует публичного IP
 resource "yandex_compute_instance" "bastion" {                                            
   name = "bastion"                                                                       
   zone = "ru-central1-a"                                                                  
