@@ -48,7 +48,9 @@ jobs:
 
   terraform-apply:
     name: Terraform for ${{ needs.setenv.outputs.env }}
-    needs: setenv
+    needs: 
+      - setenv
+      - terraform-plan
     uses: ./.github/workflows/terraform_apply.yml
     with:
       environment: ${{ needs.setenv.outputs.env }}
