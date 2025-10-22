@@ -30,6 +30,18 @@ jobs:
             echo "env=dev" >> $GITHUB_OUTPUT
           fi
 
+  terraform-checkov:
+    name: Terraform checkov
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+
+      - name: Checkov Terraform
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./terraform/
+
   terraform-plan:
     name: Terraform for ${{ needs.setenv.outputs.env }}
     needs: setenv
