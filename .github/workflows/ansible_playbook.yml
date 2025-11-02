@@ -1,5 +1,5 @@
 ---
-name: Ansible
+name: Ansible Playbook
 
 on:
   workflow_call:
@@ -19,7 +19,7 @@ jobs:
         run: |
           python3 -m pip install ansible
 
-      - name: Auto playbook
+      - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i ./inventories/${{ env.DIR }}/inventory playbook.yml
+          ansible-playbook -i ./inventories/${{ inputs.environment }}/inventory playbook.yml

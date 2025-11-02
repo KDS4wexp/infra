@@ -86,7 +86,8 @@ jobs:
     name: Ansible for ${{ needs.setenv.outputs.env }}
     needs: 
       - setenv
+      - ansible-lint
       - terraform-apply
-    uses: ./.github/workflows/ansible.yml
+    uses: ./.github/workflows/ansible_playbook.yml
     with:
       environment: ${{ needs.setenv.outputs.env }}
