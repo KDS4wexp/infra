@@ -1,9 +1,14 @@
 [bastion]
 bastion.kds4wexp1.ru
 
+[haproxy]
+haproxy.private
+
+[gitlab]
+gitlab.private
+
 [k8s-master]
 m-node-a-0.private
-
 
 [k8s-worker]
 w-node-0.private

@@ -79,6 +79,11 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
 
-  # ansible:
-  #   needs: terraform-apply
-  #   uses: ./.github/workflows/ansible.yml
+  ansible:
+    name: Ansible for ${{ needs.setenv.outputs.env }}
+    needs: 
+      - setenv
+      - terraform-apply
+    uses: ./.github/workflows/ansible.yml
+    with:
+      environment: ${{ needs.setenv.outputs.env }}

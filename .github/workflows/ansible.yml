@@ -3,15 +3,17 @@ name: Ansible
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
     
 jobs:
   check-dev:
     runs-on: ubuntu-latest
     container:
       image: python:3.14.0rc3-alpine3.22
-    environment: dev
-    env:
-      DIR: dev
+    environment: ${{ inputs.environment }}
 
     steps:
       - uses: actions/checkout@v4
