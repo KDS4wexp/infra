@@ -7,10 +7,11 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ansible/ansible-lint@v25
         with:
           working_directory: ./ansible/
+          setup_python: false
 
