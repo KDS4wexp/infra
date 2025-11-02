@@ -78,6 +78,9 @@ jobs:
       ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
+  ansible-lint:
+    name: Ansible Lint
+    uses: ./.github/workflows/ansible_lint.yml
 
   ansible:
     name: Ansible for ${{ needs.setenv.outputs.env }}

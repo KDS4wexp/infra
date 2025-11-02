@@ -14,13 +14,7 @@ jobs:
     container:
       image: python:3.14.0rc3-alpine3.22
     environment: ${{ inputs.environment }}
-
     steps:
-      - uses: actions/checkout@v4
-      - uses: ansible/ansible-lint@main
-        with:
-          working_directory: ./ansible/
-
       - name: Setup Ansible
         run: |
           python3 -m pip install ansible
