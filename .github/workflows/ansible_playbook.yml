@@ -12,7 +12,7 @@ jobs:
   check-dev:
     runs-on: ubuntu-latest
     container:
-      image: python:3.14.0rc3-alpine3.22
+      image: python:3.14
     environment: ${{ inputs.environment }}
     steps:
       - name: Setup Ansible

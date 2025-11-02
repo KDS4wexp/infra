@@ -8,9 +8,10 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    container: python:3.14
     steps:
       - uses: actions/checkout@v4
-      - uses: ansible/ansible-lint@v25.8.2
+      - uses: ansible/ansible-lint@v25.9.2
         with:
           working_directory: ./ansible/
 
