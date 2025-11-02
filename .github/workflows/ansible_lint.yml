@@ -11,7 +11,7 @@ jobs:
     container: python:3.12
     steps:
       - uses: actions/checkout@v4
-      - uses: ansible/ansible-lint@v25.9.2
+      - uses: ansible/ansible-lint@v25
         with:
           working_directory: ./ansible/
 
