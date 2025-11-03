@@ -7,6 +7,9 @@ haproxy.private
 [gitlab]
 gitlab.private
 
+[vault]
+vault.private
+
 [k8s-master]
 m-node-a-0.private
 

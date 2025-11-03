@@ -1,7 +1,7 @@
-# - name: Bastion
-#   hosts: bastion
-#   roles: 
-#     - haproxy
+- name: HAProxy
+  hosts: haproxy
+  roles:
+    - haproxy
 
 # - name: Vault
 #   hosts: vault
@@ -11,31 +11,28 @@
 # - name: GitLab
 #   hosts: gitlab
 #   roles:
-#     - gitlab-init
-#     - gitlub-runners
+#     - gitlab
 
-- name: Set up common for cluster
-  become: true
-  hosts:
-    - k8s-master
-    - k8s-worker
-  roles:
-    - k8s-common
+# - name: Set up common for cluster
+#   become: true
+#   hosts:
+#     - k8s-master
+#     - k8s-worker
+#   roles:
+#     - k8s-common
 
-- name: Initialize first master node
-  become: true
-  hosts: 
-    - k8s-master
-  roles:
-    - role: k8s-init
-      when: inventory_hostname == groups['k8s-master'][0]
+# - name: Initialize first master node
+#   become: true
+#   hosts:
+#     - k8s-master
+#   roles:
+#     - role: k8s-init
+#       when: inventory_hostname == groups['k8s-master'][0]
 
-- name: Joining a nodes to a cluster
-  become: true
-  hosts: 
-    - k8s-master
-    - k8s-worker
-  roles: 
-    - role: k8s-join
-
-
+# - name: Joining a nodes to a cluster
+#   become: true
+#   hosts:
+#     - k8s-master
+#     - k8s-worker
+#   roles:
+#     - role: k8s-join

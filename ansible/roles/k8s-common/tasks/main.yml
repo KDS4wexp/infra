@@ -1,24 +1,25 @@
 ---
 - name: Install packages
-  apt:
-    name: "{{packages}}"
-    update_cache: yes
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    update_cache: true
   vars:
     packages:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - gpg
-    - containerd
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+      - containerd
 
 - name: Copy containerd config
-  copy: 
-    src: config.toml 
+  ansible.builtin.copy:
+    src: config.toml
     dest: /etc/containerd/config.toml
+    mode: '0644'
   notify: Restart containerd
 
 - name: Remove swapfile from /etc/fstab
-  mount:
+  ansible.posix.mount:
     name: "{{ item }}"
     fstype: swap
     state: absent
@@ -27,47 +28,47 @@
     - none
 
 - name: Disable swap
-  command: swapoff -a
+  ansible.builtin.command: swapoff -a
   when: ansible_swaptotal_mb > 0
 
 - name: Add an apt signing key for Kubernetes
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
     state: present
 
 - name: Adding apt repository for Kubernetes
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: deb https://pkgs.k8s.io/core:/stable:/v1.32/deb/  /
     state: present
     filename: kubernetes.list
 
 - name: Install Kubernetes binaries
-  apt: 
+  ansible.builtin.apt:
     name: "{{ packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   vars:
     packages:
-      - kubelet 
-      - kubeadm 
+      - kubelet
+      - kubeadm
       - kubectl
 
 - name: Change sysctl.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sysctl.conf
     regexp: '#net.ipv4.ip_forward=1'
     line: 'net.ipv4.ip_forward=1'
     state: present
 
-- name: ip_Forward on
-  sysctl:
+- name: Ip_Forward on
+  ansible.posix.sysctl:
     name: net.ipv4.ip_forward
     value: '1'
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes
-  
+    reload: true
+
 - name: Enable kubelet
-  service:
+  ansible.builtin.service:
     name: kubelet
     state: started
