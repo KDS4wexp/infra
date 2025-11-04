@@ -136,7 +136,7 @@ resource "yandex_vpc_security_group" "bastion_security"{
     description = "SSH"
     protocol = "TCP"
     port = 22
-    v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24", "85.172.104.207/32"]
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
     description = "DNS TCP"

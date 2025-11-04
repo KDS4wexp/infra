@@ -82,7 +82,7 @@ jobs:
     name: Ansible Lint
     uses: ./.github/workflows/ansible_lint.yml
 
-  ansible:
+  ansible-playbook:
     name: Ansible for ${{ needs.setenv.outputs.env }}
     needs: 
       - setenv

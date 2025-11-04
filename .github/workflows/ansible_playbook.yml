@@ -9,7 +9,8 @@ on:
         required: true
     
 jobs:
-  check-dev:
+  ansible-playbook:
+    name: Playbook
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
