@@ -1,0 +1,13 @@
+[Unit]
+Description=HashiCorp Vault
+After=network.target
+
+[Service]
+Type=simple
+User=vault
+Group=vault
+ExecStart=usr/local/bin/vault server -config=/mnt/vault/data/config.hcl
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

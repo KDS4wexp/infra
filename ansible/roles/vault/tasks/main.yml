@@ -1,1 +1,35 @@
 ---
+- name: Install HashiCorp Vault from Yandex mirror
+  ansible.builtin.get_url:
+    url: https://mirror.yandex.ru/mirrors/releases.hashicorp.com/vault/1.21.0/vault_1.21.0_linux_amd64.zip
+    dest: usr/local/bin/
+  become: true
+
+- name: Unzip Vault
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: usr/local/bin/vault_1.21.0_linux_amd64.zip
+    dest: usr/local/bin/
+  become: true
+
+- name: Copy config.hcl
+  ansible.builtin.copy:
+    src: config.hcl
+    dest: /mnt/vault/data/config.hcl
+    mode: '0644'
+  
+- name: Enable Vault service
+  ansible.builtin.service:
+    enabled:
+      name: vault
+      state: started
+
+- name: Enable PKI via REST API
+  ansible.builtin.uri:
+    url: http://127.0.0.1:8200
+    method: POST
+    headers: "X-Vault-Token: { vault-token }"
+    body: |
+      { 
+        "type": "pki"
+      }

@@ -1,4 +1,12 @@
 ---
 - name: Install HAProxy
-  apt:
-    name: haproxy=3.1.8
+  ansible.builtin.apt:
+    update_cache: true
+    name: haproxy=2.6.12-1+deb12u3
+  become: true
+
+- name: Copy config file
+  ansible.builtin.copy:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+  become: true

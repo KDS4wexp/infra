@@ -3,10 +3,10 @@
   roles:
     - haproxy
 
-# - name: Vault
-#   hosts: vault
-#   roles:
-#     - vault
+- name: Vault
+  hosts: vault
+  roles:
+    - vault
 
 # - name: GitLab
 #   hosts: gitlab
