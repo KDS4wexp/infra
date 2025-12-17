@@ -9,7 +9,7 @@ on:
         required: true
     
 jobs:
-  ansible-playbook:
+  playbook:
     name: Playbook
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -18,7 +18,15 @@ jobs:
         run: |
           python3 -m pip install ansible
 
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collections install cloud.terraform
+
+      - name: Generate Ansible inventory
+        run: |
+          ansible-inventory -i generate-inventory.yml --graph 
+
       - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i ./inventories/${{ inputs.environment }}/inventory playbook.yml
+          ansible-playbook -i ./inventories/${{ inputs.environment }}/inventory main_ci.yml

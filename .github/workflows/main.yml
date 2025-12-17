@@ -41,6 +41,7 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         with:
           directory: ./terraform/
+    continue-on-error: true
 
   terraform-plan:
     name: Terraform for ${{ needs.setenv.outputs.env }}

@@ -1,12 +1,13 @@
-- name: HAProxy
-  hosts: haproxy
-  roles:
-    - haproxy
-
+# - name: HAProxy
+#   hosts: haproxy
+#   roles:
+#     - haproxy
+  
 - name: Vault
   hosts: vault
   roles:
     - vault
+  become: true
 
 # - name: GitLab
 #   hosts: gitlab

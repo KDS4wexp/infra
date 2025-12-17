@@ -1,13 +1,19 @@
 [Unit]
-Description=HashiCorp Vault
-After=network.target
+Description="HashiCorp Vault"
+Documentation="https://developer.hashicorp.com/vault/docs"
+ConditionFileNotEmpty="${VAULT_CONFIG}/vault.hcl"
 
 [Service]
-Type=simple
 User=vault
 Group=vault
-ExecStart=usr/local/bin/vault server -config=/mnt/vault/data/config.hcl
-Restart=on-failure
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+NoNewPrivileges=yes
+ExecStart=/usr/local/bin/vault server -config=/mnt/vault/data/config.hcl
+ExecReload=/bin/kill --signal HUP
+KillMode=process
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target

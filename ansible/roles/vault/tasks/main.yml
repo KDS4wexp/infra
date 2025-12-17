@@ -2,27 +2,53 @@
 - name: Install HashiCorp Vault from Yandex mirror
   ansible.builtin.get_url:
     url: https://mirror.yandex.ru/mirrors/releases.hashicorp.com/vault/1.21.0/vault_1.21.0_linux_amd64.zip
-    dest: usr/local/bin/
-  become: true
+    dest: /usr/local/bin/
 
 - name: Unzip Vault
   ansible.builtin.unarchive:
     remote_src: true
-    src: usr/local/bin/vault_1.21.0_linux_amd64.zip
-    dest: usr/local/bin/
-  become: true
+    src: /usr/local/bin/vault_1.21.0_linux_amd64.zip
+    dest: /usr/local/bin/
 
 - name: Copy config.hcl
   ansible.builtin.copy:
     src: config.hcl
-    dest: /mnt/vault/data/config.hcl
+    dest: /mnt/vault/data/
     mode: '0644'
-  
+
+- name: Copy vault.service
+  ansible.builtin.copy:
+    src: vault.service
+    dest: /etc/systemd/system/
+    mode: '0644'
+
+- name: Generate private key
+  ansible.builtin.openssl_privatekey:
+    path: /etc/ssl/private/vault-key.pem
+    size: 4096
+    type: RSA
+
+- name: Generate an OpenSSL CA Certificate Signing Request
+  ansible.builtin.openssl_csr:
+    path: /etc/ssl/csr/vault-csr.csr
+    privatekey_path: /etc/ssl/private/vault-key.pem
+    common_name: localhost
+    basic_constraints:
+      - "CA:TRUE"
+
+- name: Generate a Self Signed OpenSSL CA certificate
+  ansible.builtin.openssl_certificate:
+    path: /etc/ssl/certs/vault-ca.pem
+    privatekey_path: /etc/ssl/private/vault-key.pem
+    csr_path: /etc/ssl/csr/vault-csr.csr
+    provider: selfsigned
+    selfsigned_not_after: "+3650d"
+
+
 - name: Enable Vault service
   ansible.builtin.service:
-    enabled:
-      name: vault
-      state: started
+    name: vault
+    state: started
 
 - name: Enable PKI via REST API
   ansible.builtin.uri:
