@@ -67,9 +67,9 @@ jobs:
           ls -a
 
       - name: DEBUG ansible
-        working-directory: ./ansible/
+        working-directory: ./terraform/.terraform
         run: |
-          ls -a
+          cat terraform.tfstate
 
       - name: Check generate Ansible inventory
         working-directory: ./ansible/
