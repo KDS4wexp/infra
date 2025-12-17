@@ -65,7 +65,7 @@ jobs:
         working-directory: ./terraform/
         run: |
           terraform show
-          
+
       - name: DEBUG terraform
         working-directory: ./terraform/.terraform
         run: |
@@ -79,7 +79,7 @@ jobs:
       - name: Check generate Ansible inventory
         working-directory: ./ansible/
         run: |
-          ansible-inventory -i inventory.yml --graph 
+          ansible-inventory -i inventory.yml --graph  -vvvv
 
       - name: Run Playbook
         working-directory: ./ansible/
