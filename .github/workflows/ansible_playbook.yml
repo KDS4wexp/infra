@@ -23,6 +23,7 @@ jobs:
           ansible-galaxy collection install cloud.terraform
 
       - name: Check generate Ansible inventory
+        working-directory: ./ansible/
         run: |
           ansible-inventory -i inventory --graph 
 
