@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Setup Ansible
         run: |
           python3 -m pip install ansible
