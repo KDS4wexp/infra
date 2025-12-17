@@ -51,6 +51,11 @@ jobs:
       - name: Install Ansible collection
         run: |
           ansible-galaxy collection install cloud.terraform
+      
+      - name: DEBUG
+        run: |
+          pwd \
+          ls -a
 
       - name: Terraform Init
         working-directory: ./terraform/
@@ -60,6 +65,18 @@ jobs:
             -backend-config="bucket=${{ secrets.BUCKET }}" \
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+
+      - name: DEBUG terraform
+        working-directory: ./terraform/
+        run: |
+          pwd \
+          ls -a
+
+      - name: DEBUG terraform
+        working-directory: ./ansible/
+        run: |
+          pwd \
+          ls -a
 
       - name: Check generate Ansible inventory
         working-directory: ./ansible/
