@@ -18,9 +18,9 @@ jobs:
         run: |
           python3 -m pip install ansible
 
-      - name: Install Ansible collections
+      - name: Install Ansible collection
         run: |
-          ansible-galaxy collections install cloud.terraform
+          ansible-galaxy collection install cloud.terraform
 
       - name: Generate Ansible inventory
         run: |
