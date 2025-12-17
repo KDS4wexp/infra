@@ -92,3 +92,12 @@ jobs:
     uses: ./.github/workflows/ansible_playbook.yml
     with:
       environment: ${{ needs.setenv.outputs.env }}
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      CLOUD: ${{ secrets.CLOUD }}
+      FOLDER: ${{ secrets.FOLDER }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      PUBLIC_SSH_KEY: ${{ secrets.PUBLIC_SSH_KEY }}
+      BUCKET: ${{ secrets.BUCKET }}
+      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
