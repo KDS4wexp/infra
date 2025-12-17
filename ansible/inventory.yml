@@ -1,2 +1,2 @@
 plugin: cloud.terraform.terraform_provider
-project_path: ../terraform/
+project_path: ../terraform/.terraform/
