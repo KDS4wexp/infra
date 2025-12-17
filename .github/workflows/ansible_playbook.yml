@@ -22,11 +22,11 @@ jobs:
         run: |
           ansible-galaxy collection install cloud.terraform
 
-      - name: Generate Ansible inventory
+      - name: Check generate Ansible inventory
         run: |
-          ansible-inventory -i generate-inventory.yml --graph 
+          ansible-inventory -i inventory --graph 
 
       - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i ./inventories/${{ inputs.environment }}/inventory main_ci.yml
+          ansible-playbook -i inventory main_ci.yml
