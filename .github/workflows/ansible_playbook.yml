@@ -64,9 +64,9 @@ jobs:
       - name: Check generate Ansible inventory
         working-directory: ./ansible/
         run: |
-          ansible-inventory -i inventory --graph 
+          ansible-inventory -i inventory.yml --graph 
 
       - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i inventory main_ci.yml
+          ansible-playbook -i inventory.yml main_ci.yml
