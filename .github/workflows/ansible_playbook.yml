@@ -62,11 +62,11 @@ jobs:
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
 
       - name: DEBUG terraform
-        working-directory: ./terraform/
+        working-directory: ./terraform/.terraform
         run: |
           ls -a
 
-      - name: DEBUG terraform
+      - name: DEBUG ansible
         working-directory: ./ansible/
         run: |
           ls -a
