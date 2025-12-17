@@ -61,6 +61,11 @@ jobs:
             -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
             -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
 
+      - name: Terraform SHOW
+        working-directory: ./terraform/
+        run: |
+          terraform show
+          
       - name: DEBUG terraform
         working-directory: ./terraform/.terraform
         run: |
