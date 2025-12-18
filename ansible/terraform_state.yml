@@ -2,16 +2,11 @@ plugin: cloud.terraform.terraform_state
 
 backend_type: s3
 backend_config:
-  endpoints:
-    s3: https://storage.yandexcloud.net
   region: ru-central1
   bucket: "{{ lookup('env', 'BUCKET') }}"
   key: "terraform/{{ lookup('env', 'ENV') }}/terraform.tfstate"
-  access_key: "{{ lookup('env', 'ACCESS_KEY') }}"
-  secret_key: "{{ lookup('env', 'SECRET_KEY') }}"
   skip_region_validation: true
   scip_credentials_validation: true
-  
 
 provider_mapping:
   - provider_name: registry.terraform.io/yandex-cloud/yandex
