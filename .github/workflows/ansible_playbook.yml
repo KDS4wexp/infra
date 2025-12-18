@@ -80,9 +80,9 @@ jobs:
       - name: Check generate Ansible inventory
         working-directory: ./ansible/
         run: |
-          ansible-inventory -i inventory.yml --graph  -vvvv
+          ansible-inventory -i terraform_state.yml --graph  -vvvv
 
       - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i inventory.yml main_ci.yml
+          ansible-playbook -i terraform_state.yml main_ci.yml
