@@ -35,7 +35,7 @@ ssh-keygen -t rsa -b 4096
 
 В Repository secrets:
 ```
-- TOKEN             "IAM token"
+- TOKEN             "OAuth token"
 - CLOUD             "id облака"
 - BUCKET            "Имя s3 хранилища"
 - ACCESS_KEY        "Сгенерированный ключ доступа"

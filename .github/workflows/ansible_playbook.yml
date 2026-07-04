@@ -49,40 +49,11 @@ jobs:
         run: |
           python3 -m pip install ansible
 
-      - name: Install Ansible collection
+      - name: Setup lib
         run: |
-          ansible-galaxy collection install cloud.terraform
-
-      - name: Terraform Init
-        working-directory: ./terraform/
-        run: |
-          terraform init -input=false \
-            -backend-config="key=terraform/${{ inputs.environment }}/terraform.tfstate" \
-            -backend-config="bucket=${{ secrets.BUCKET }}" \
-            -backend-config="access_key=${{ secrets.ACCESS_KEY }}" \
-            -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
-
-      - name: Terraform SHOW
-        working-directory: ./terraform/
-        run: |
-          terraform show
-
-      - name: DEBUG terraform
-        working-directory: ./terraform/.terraform
-        run: |
-          ls -a
-
-      - name: DEBUG ansible
-        working-directory: ./terraform/.terraform
-        run: |
-          cat terraform.tfstate
-
-      - name: Check generate Ansible inventory
-        working-directory: ./ansible/
-        run: |
-          ansible-inventory -i terraform_state.yml --graph  -vvvv
+          pip install requests
 
       - name: Run Playbook
         working-directory: ./ansible/
         run: |
-          ansible-playbook -i terraform_state.yml main_ci.yml
+          ansible-playbook -i yandex_ec2.yml main_ci.yml

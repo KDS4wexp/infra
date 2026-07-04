@@ -1,169 +1,169 @@
 # CORE INFRASTRUCTURE
 # ---------------------------------------------------------------------------
 
-resource "yandex_vpc_network" "network" {                                                   
-  name = "network"
-}
+# resource "yandex_vpc_network" "network" {                                                   
+#   name = "network"
+# }
 
-resource "yandex_vpc_subnet" "public_a" {                                                   
-  name = "public_a"
-  v4_cidr_blocks = ["10.0.0.0/24"]
-  zone = "ru-central1-a"
-  network_id = yandex_vpc_network.network.id
-}
+# resource "yandex_vpc_subnet" "public_a" {                                                   
+#   name = "public_a"
+#   v4_cidr_blocks = ["10.0.0.0/24"]
+#   zone = "ru-central1-a"
+#   network_id = yandex_vpc_network.network.id
+# }
 
-resource "yandex_vpc_subnet" "private_a" {                                                 
-  name = "private_a"
-  v4_cidr_blocks = ["10.0.1.0/24"]
-  zone = "ru-central1-a"
-  network_id = yandex_vpc_network.network.id
-  route_table_id = yandex_vpc_route_table.route.id
-}
+# resource "yandex_vpc_subnet" "private_a" {                                                 
+#   name = "private_a"
+#   v4_cidr_blocks = ["10.0.1.0/24"]
+#   zone = "ru-central1-a"
+#   network_id = yandex_vpc_network.network.id
+#   route_table_id = yandex_vpc_route_table.route.id
+# }
 
-resource "yandex_vpc_route_table" "route" {                                                 
-  name = "route"
-  network_id = yandex_vpc_network.network.id
-  static_route {
-    destination_prefix = "0.0.0.0/0"
-    gateway_id = yandex_vpc_gateway.gateway.id
-  }
-}
+# resource "yandex_vpc_route_table" "route" {                                                 
+#   name = "route"
+#   network_id = yandex_vpc_network.network.id
+#   static_route {
+#     destination_prefix = "0.0.0.0/0"
+#     gateway_id = yandex_vpc_gateway.gateway.id
+#   }
+# }
 
-resource "yandex_vpc_gateway" "gateway" {                                                   
-  name = "gateway"
-  shared_egress_gateway {}
-}
+# resource "yandex_vpc_gateway" "gateway" {                                                   
+#   name = "gateway"
+#   shared_egress_gateway {}
+# }
 
-resource "yandex_dns_zone" "public_zone" {                                                  
-  name = "public"
-  zone = "${var.domain}."
-  public = true
-}
+# resource "yandex_dns_zone" "public_zone" {                                                  
+#   name = "public"
+#   zone = "${var.domain}."
+#   public = true
+# }
 
-resource "yandex_dns_zone" "private_zone" {                                                 
-  name = "private"
-  zone = "private."
-  private_networks = [yandex_vpc_network.network.id]
-}
+# resource "yandex_dns_zone" "private_zone" {                                                 
+#   name = "private"
+#   zone = "private."
+#   private_networks = [yandex_vpc_network.network.id]
+# }
 
-resource "yandex_cm_certificate" "cert" {                                                     
-  name = "cert"
-  domains = [ var.domain ]
-  managed {
-    challenge_type = "DNS_CNAME"
-  }
-}
+# resource "yandex_cm_certificate" "cert" {                                                     
+#   name = "cert"
+#   domains = [ var.domain ]
+#   managed {
+#     challenge_type = "DNS_CNAME"
+#   }
+# }
 
-resource "yandex_dns_recordset" "rs_cert" {                                                   
-  zone_id = yandex_dns_zone.public_zone.id
-  name = yandex_cm_certificate.cert.challenges.0.dns_name
-  type = yandex_cm_certificate.cert.challenges.0.dns_type
-  ttl = 200
-  data = [yandex_cm_certificate.cert.challenges.0.dns_value]
-}
+# resource "yandex_dns_recordset" "rs_cert" {                                                   
+#   zone_id = yandex_dns_zone.public_zone.id
+#   name = yandex_cm_certificate.cert.challenges.0.dns_name
+#   type = yandex_cm_certificate.cert.challenges.0.dns_type
+#   ttl = 200
+#   data = [yandex_cm_certificate.cert.challenges.0.dns_value]
+# }
 
-resource "yandex_dns_recordset" "rs_gitlab" {                                               
-  name = "gitlab"
-  zone_id = yandex_dns_zone.private_zone.id
-  type = "A"
-  ttl = 200
-  data = [yandex_compute_instance.gitlab.network_interface.0.ip_address]
-}
+# resource "yandex_dns_recordset" "rs_gitlab" {                                               
+#   name = "gitlab"
+#   zone_id = yandex_dns_zone.private_zone.id
+#   type = "A"
+#   ttl = 200
+#   data = [yandex_compute_instance.gitlab.network_interface.0.ip_address]
+# }
 
-resource "yandex_dns_recordset" "rs_vault" {                                             
-  name = "vault"
-  zone_id = yandex_dns_zone.private_zone.id
-  type = "A"
-  ttl = 200
-  data = [yandex_compute_instance.vault.network_interface.0.ip_address]
-}
+# resource "yandex_dns_recordset" "rs_vault" {                                             
+#   name = "vault"
+#   zone_id = yandex_dns_zone.private_zone.id
+#   type = "A"
+#   ttl = 200
+#   data = [yandex_compute_instance.vault.network_interface.0.ip_address]
+# }
 
-resource "yandex_vpc_security_group" "bastion_security"{                                  
-  name = "bastion_security"                                                               
-  network_id = yandex_vpc_network.network.id                                              
-  ingress {
-    description = "SSH"
-    protocol = "TCP"
-    port = 22
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "DNS TCP"
-    protocol = "TCP"
-    port = 53
-    v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
-  }
-  ingress {
-    description = "DNS UDP"
-    protocol = "UDP"
-    port = 53
-    v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
-  }
-  ingress {
-    description = "HTTP"
-    protocol = "TCP"
-    port = 80
-    v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
-  }
-  ingress {
-    description = "HTTPS"
-    protocol = "TCP"
-    port = 443
-    v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
-  }
-  egress {
-    description = "ANY"
-    protocol = "ANY"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+# resource "yandex_vpc_security_group" "bastion_security"{                                  
+#   name = "bastion_security"                                                               
+#   network_id = yandex_vpc_network.network.id                                              
+#   ingress {
+#     description = "SSH"
+#     protocol = "TCP"
+#     port = 22
+#     v4_cidr_blocks = ["0.0.0.0/0"]
+#   }
+#   ingress {
+#     description = "DNS TCP"
+#     protocol = "TCP"
+#     port = 53
+#     v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
+#   }
+#   ingress {
+#     description = "DNS UDP"
+#     protocol = "UDP"
+#     port = 53
+#     v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
+#   }
+#   ingress {
+#     description = "HTTP"
+#     protocol = "TCP"
+#     port = 80
+#     v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
+#   }
+#   ingress {
+#     description = "HTTPS"
+#     protocol = "TCP"
+#     port = 443
+#     v4_cidr_blocks = ["10.0.0.10/32", "10.0.1.0/24"]
+#   }
+#   egress {
+#     description = "ANY"
+#     protocol = "ANY"
+#     v4_cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
-resource "yandex_compute_instance" "vault" {                                            
-  name = "vault"                                                                        
-  zone = "ru-central1-a"                                                                
-  hostname = "vault"                                                                  
-  resources {                                                                                                                         
-    cores = 2                                                                   
-    memory = 2                                                                  
-  }
-  boot_disk {
-    initialize_params {
-      image_id = "fd8vcepv1aqfhv50oqjf"
-    }
-  }
-  network_interface {
-    subnet_id = yandex_vpc_subnet.private_a.id
-    security_group_ids = [yandex_vpc_security_group.bastion_security.id]
-    ip_address = "10.0.1.11"
-  }
-  metadata = {
-    ssh-keys = "ubuntu:${var.public_ssh_key}"
-  }
-}
+# resource "yandex_compute_instance" "vault" {                                            
+#   name = "vault"                                                                        
+#   zone = "ru-central1-a"                                                                
+#   hostname = "vault"                                                                  
+#   resources {                                                                                                                         
+#     cores = 2                                                                   
+#     memory = 2                                                                  
+#   }
+#   boot_disk {
+#     initialize_params {
+#       image_id = "fd8vcepv1aqfhv50oqjf"
+#     }
+#   }
+#   network_interface {
+#     subnet_id = yandex_vpc_subnet.private_a.id
+#     security_group_ids = [yandex_vpc_security_group.bastion_security.id]
+#     ip_address = "10.0.1.11"
+#   }
+#   metadata = {
+#     ssh-keys = "ubuntu:${var.public_ssh_key}"
+#   }
+# }
 
-resource "yandex_compute_instance" "gitlab" {                                               
-  name = "gitlab"                                                                           
-  zone = "ru-central1-a"                                                                    
-  hostname = "gitlab"                                                                     
-  resources {                                                                                                                        
-    cores = 4                                                                   
-    memory = 8                                                                  
-  }
-  boot_disk {
-    initialize_params {
-      image_id = "fd8vcepv1aqfhv50oqjf"
-      size = 16
-    }
-  }
-  network_interface {
-    subnet_id = yandex_vpc_subnet.private_a.id
-    security_group_ids = [yandex_vpc_security_group.bastion_security.id]
-    ip_address = "10.0.1.12"
-  }
-  metadata = {
-    ssh-keys = "ubuntu:${var.public_ssh_key}"
-  }
-}
+# resource "yandex_compute_instance" "gitlab" {                                               
+#   name = "gitlab"                                                                           
+#   zone = "ru-central1-a"                                                                    
+#   hostname = "gitlab"                                                                     
+#   resources {                                                                                                                        
+#     cores = 4                                                                   
+#     memory = 8                                                                  
+#   }
+#   boot_disk {
+#     initialize_params {
+#       image_id = "fd8vcepv1aqfhv50oqjf"
+#       size = 16
+#     }
+#   }
+#   network_interface {
+#     subnet_id = yandex_vpc_subnet.private_a.id
+#     security_group_ids = [yandex_vpc_security_group.bastion_security.id]
+#     ip_address = "10.0.1.12"
+#   }
+#   metadata = {
+#     ssh-keys = "ubuntu:${var.public_ssh_key}"
+#   }
+# }
 
 
 
